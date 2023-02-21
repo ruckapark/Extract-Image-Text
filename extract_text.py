@@ -10,6 +10,22 @@ import pytesseract
 import numpy as np
 from datetime import datetime
 
+def extract_datetext(img,cmd = r'C:\Program Files (x86)\Tesseract-OCR\tesseract.exe'):
+    
+    pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files (x86)\Tesseract-OCR\tesseract.exe'
+    im = cv2.imread(img,0)
+    
+    #portion of interest
+    crop = np.flip(np.transpose(im[0:140,944:964]),0)
+    text_im = 255 - crop
+    
+    custom = r'-l eng --oem 3 --psm 6'
+    
+    date = pytesseract.image_to_string(text_im, lang='eng', config=custom)
+    date = date.strip()
+    
+    return [date,datetime.strptime(date, "%d/%m/%Y %H:%M:%S")]
+
 if __name__ == '__main__':
     
     
