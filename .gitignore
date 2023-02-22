@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# ffmpeg - can be easily downloaded
+ffmpeg.exe
+
 # C extensions
 *.so
 
