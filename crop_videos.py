@@ -32,13 +32,30 @@ def extract_endpoints(vid,ffm_path = 'None',output_dir = 'None'):
     if output_dir == 'None':
         output_dir = os.getcwd()
     
-    output_first = r'{}\{}_first.jpg'.format(output_dir,vid.split('.')[0])
-    output_last = r'{}\{}_last.jpg'.format(output_dir,vid.split('.')[0])
+    output_first = r'{}\{}_first.jpg'.format(output_dir,vid.split('\\')[-1].split('.')[0])
+    output_last = r'{}\{}_last.jpg'.format(output_dir,vid.split('\\')[-1].split('.')[0])
     
-    os.system('{} -y -i {} -vf "select=eq(n\,0)" -q:v 2 {}'.format(ffm_path,vid,output_first))
+    os.system('{} -y -i {} -vframes 1 {}'.format(ffm_path,vid,output_first))
+    #os.system('{} -y -i {} -vf "select=eq(n\,0)" -q:v 2 {}'.format(ffm_path,vid,output_first))
     os.system('{} -y -sseof -3 -i {} -vsync 0 -q:v 2 -update true {}'.format(ffm_path,vid,output_last))
     
     return [output_first,output_last]
+
+def extract_image(vid,output,timestamp = None,ffm_path = 'None',output_dir = 'None'):
+    
+    if ffm_path == 'None':
+        ffm_path = r'{}\ffmpeg.exe'.format(os.getcwd())
+    if output_dir == 'None':
+        output_dir = os.getcwd()
+        
+    output = r'{}\{}'.format(output_dir,output.split('\\')[-1])
+    
+    if timestamp:
+        os.system('{} -y -ss {} -i {} -frames:v 1 -q:v 2 {}'.format(ffm_path,timestamp,vid,output))
+    else:
+        os.system('{} -y -i {} -vframes 1 {}'.format(ffm_path,vid,output))
+        
+    return output
 
 
 def crop_vid(vid,start,end,ffm_path = 'None',output_dir = 'None'):
@@ -65,7 +82,7 @@ def crop_vid(vid,start,end,ffm_path = 'None',output_dir = 'None'):
     if output_dir == 'None':
         output_dir = os.getcwd()
         
-    output = r'{}\{}_crop.avi'.format(output_dir,vid.split('.')[0])
+    output = r'{}\{}_crop.avi'.format(output_dir,vid.split('\\')[-1].split('.')[0])
     
     crop_time = end - start
     crop_time = strf.strfdelta(crop_time)
@@ -73,6 +90,42 @@ def crop_vid(vid,start,end,ffm_path = 'None',output_dir = 'None'):
     os.system('{} -y -i {} -acodec copy -vcodec copy -copyts -ss 00:00:00 -t {} {}'.format(ffm_path,vid,crop_time,output))
     
     return output
+
+def check_samevid(path1,path2,ffm_path = None):
+    """ 
+    Logic:
+    determine smaller file
+    find length of smaller file
+    extract first and (almost) last image from file
+    extract equivalents from larger file
+    open with cv and check if there are the same
+    """
+    size1 = os.path.getsize(path1)
+    if os.path.getsize(path2) > size1:
+        file = path1
+    else:
+        file = path2
+    
+    start,end = extract_endpoints(file)
+    start = get_datetime(start)
+    end = get_datetime(end)
+    delta = end - start - datetime.timedelta(seconds = 2)    #give lag error
+    delta = strf.strfdelta(delta)
+    
+    in1,out1 = extract_image(path1,'in1.jpg'),extract_image(path1,'out1.jpg',timestamp = delta)
+    in2,out2 = extract_image(path2,'in2.jpg'),extract_image(path2,'out2.jpg',timestamp = delta)
+    start = text.compare_images(in1,in2)
+    end = text.compare_images(out1,out2)
+    
+    for f in [in1,out1,in2,out2]: os.remove(f)
+    
+    if start and end:
+        return True
+    else:
+        return False
+    
+def get_datetime(im):
+    return text.extract_datetext(im)[-1]
 
 if __name__ == '__main__':
     

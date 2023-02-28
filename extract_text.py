@@ -10,6 +10,11 @@ import pytesseract
 import numpy as np
 from datetime import datetime
 
+def compare_images(img1,img2):
+    
+    im1,im2 = cv2.imread(img1,0),cv2.imread(img2,0)
+    return np.array_equal(im1,im2)
+
 def extract_datetext(img,cmd = r'C:\Program Files (x86)\Tesseract-OCR\tesseract.exe'):
     
     pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files (x86)\Tesseract-OCR\tesseract.exe'

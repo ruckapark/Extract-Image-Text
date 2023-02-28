@@ -10,6 +10,21 @@ Function to change datetime to string for ffmpeg crop
 import datetime
 
 def strfdelta(tdelta, fmt = "{hours}:{minutes}:{seconds}"):
+    """
+
+    Parameters
+    ----------
+    tdelta : datetime.timedelta
+        n/a.
+    fmt : string format, optional
+        how output should be formatted in string form. The default is "{hours}:{minutes}:{seconds}".
+
+    Returns
+    -------
+    string
+        timedelta in string form.
+
+    """
     d = {}
     days = tdelta.days
     d["hours"], rem = divmod(tdelta.seconds, 3600)
