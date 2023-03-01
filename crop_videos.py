@@ -14,7 +14,7 @@ import numpy as np
 import extract_text as text
 import datetime_strf as strf
 
-def extract_endpoints(vid,ffm_path = 'None',output_dir = 'None'):
+def extract_endpoints(vid,ffm_path = None,output_dir = None):
     """
     Parameters
     ----------
@@ -27,9 +27,9 @@ def extract_endpoints(vid,ffm_path = 'None',output_dir = 'None'):
         '{}_first.jpg'.formate(vid)
         '{}_last.jpg'.formate(vid)
     """
-    if ffm_path == 'None':
+    if not ffm_path:
         ffm_path = r'{}\ffmpeg.exe'.format(os.getcwd())
-    if output_dir == 'None':
+    if not output_dir:
         output_dir = os.getcwd()
     
     output_first = r'{}\{}_first.jpg'.format(output_dir,vid.split('\\')[-1].split('.')[0])
@@ -41,11 +41,11 @@ def extract_endpoints(vid,ffm_path = 'None',output_dir = 'None'):
     
     return [output_first,output_last]
 
-def extract_image(vid,output,timestamp = None,ffm_path = 'None',output_dir = 'None'):
+def extract_image(vid,output,timestamp = None,ffm_path = None,output_dir = None):
     
-    if ffm_path == 'None':
+    if not ffm_path:
         ffm_path = r'{}\ffmpeg.exe'.format(os.getcwd())
-    if output_dir == 'None':
+    if not output_dir:
         output_dir = os.getcwd()
         
     output = r'{}\{}'.format(output_dir,output.split('\\')[-1])
@@ -58,7 +58,7 @@ def extract_image(vid,output,timestamp = None,ffm_path = 'None',output_dir = 'No
     return output
 
 
-def crop_vid(vid,start,end,ffm_path = 'None',output_dir = 'None'):
+def crop_vid(vid,start,end,ffm_path = None,output_dir = None):
     """
     end - start must be shorter than the original video!
     if not this will raise ffmpeg error
@@ -77,9 +77,9 @@ def crop_vid(vid,start,end,ffm_path = 'None',output_dir = 'None'):
     Name of newly saved file cropped
     """   
     
-    if ffm_path == 'None':
+    if not ffm_path:
         ffm_path = r'{}\ffmpeg.exe'.format(os.getcwd())
-    if output_dir == 'None':
+    if not output_dir:
         output_dir = os.getcwd()
         
     output = r'{}\{}_crop.avi'.format(output_dir,vid.split('\\')[-1].split('.')[0])
@@ -91,7 +91,7 @@ def crop_vid(vid,start,end,ffm_path = 'None',output_dir = 'None'):
     
     return output
 
-def check_samevid(path1,path2,ffm_path = None):
+def check_samevid(path1,path2,ffm_path = None,output_dir = None):
     """ 
     Logic:
     determine smaller file
@@ -106,14 +106,17 @@ def check_samevid(path1,path2,ffm_path = None):
     else:
         file = path2
     
-    start,end = extract_endpoints(file)
+    start,end = extract_endpoints(file,ffm_path = ffm_path,output_dir = output_dir)
+    print(start,end)
     start = get_datetime(start)
     end = get_datetime(end)
     delta = end - start - datetime.timedelta(seconds = 2)    #give lag error
     delta = strf.strfdelta(delta)
     
-    in1,out1 = extract_image(path1,'in1.jpg'),extract_image(path1,'out1.jpg',timestamp = delta)
-    in2,out2 = extract_image(path2,'in2.jpg'),extract_image(path2,'out2.jpg',timestamp = delta)
+    in1 = extract_image(path1,'in1.jpg',ffm_path = ffm_path,output_dir = output_dir)
+    out1 = extract_image(path1,'out1.jpg',timestamp = delta,ffm_path = ffm_path,output_dir = output_dir)
+    in2 = extract_image(path2,'in2.jpg',ffm_path = ffm_path,output_dir = output_dir)
+    out2 = extract_image(path2,'out2.jpg',timestamp = delta,ffm_path = ffm_path,output_dir = output_dir)
     start = text.compare_images(in1,in2)
     end = text.compare_images(out1,out2)
     
