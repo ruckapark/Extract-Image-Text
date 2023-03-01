@@ -22,3 +22,5 @@ Extract first frame from video
 
 Extract Last frame from video
 - ffmpeg -sseof -3 -i file -vsync 0 -q:v 31 -update true out.jpg
+
+Extract exact frame
