@@ -10,6 +10,34 @@ import pytesseract
 import numpy as np
 from datetime import datetime
 
+def strptime_(string):
+    return datetime.strptime(string, "%d/%m/%Y %H:%M:%S")
+    
+def strptime_backup1(string):
+    return datetime.strptime(string, "%d/%m%Y %H:%M:%S")
+    
+def strptime_backup2(string):
+    return datetime.strptime(string, "%d%m/%Y %H:%M:%S")
+    
+def strptime_backup3(string):
+    return datetime.strptime(string, "%d%m%Y %H:%M:%S")
+
+def strptime(string):
+    
+    strps = [
+        strptime_,
+        strptime_backup1,
+        strptime_backup2,
+        strptime_backup3]
+    
+    for strp in strps:
+        try:
+            string = strp(string)
+            return string
+            break
+        except:
+            continue
+
 def compare_images(img1,img2):
     
     im1,im2 = cv2.imread(img1,0),cv2.imread(img2,0)
@@ -29,7 +57,8 @@ def extract_datetext(img,cmd = r'C:\Program Files (x86)\Tesseract-OCR\tesseract.
     date = pytesseract.image_to_string(text_im, lang='eng', config=custom)
     date = date.strip()
     
-    return [date,datetime.strptime(date, "%d/%m/%Y %H:%M:%S")]
+    return [date,strptime(date)]
+    
 
 if __name__ == '__main__':
     
@@ -49,7 +78,7 @@ if __name__ == '__main__':
     #here you should download the tesseract binaries, do not use the pytesseract.exe wrapper
     pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files (x86)\Tesseract-OCR\tesseract.exe'    
     
-    img = cv2.imread('20210430-174053_Erpo_1h.jpg',0)
+    img = cv2.imread('20201120-093425_Erpo_0001_crop_last.jpg',0)
     
     #portion of interest
     cropped_img = np.flip(np.transpose(img[0:140,944:964]),0)
@@ -61,4 +90,5 @@ if __name__ == '__main__':
     date_str = pytesseract.image_to_string(text_img, lang='eng', config=custom_conf)
     date_str = date_str.strip()
     
-    date = datetime.strptime(date_str, "%d/%m/%Y %H:%M:%S")
+    #date = strptime_backup2(date_str)
+    date = strptime(date_str)
