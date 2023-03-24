@@ -132,6 +132,12 @@ def get_datetime(im):
 
 if __name__ == '__main__':
     
+    """
+    DEBUG
+    check = check_samevid(r'I:\TXM760-PC\20210506-230001\20210506-230001_Erpo_0001.avi' , r'I:\TXM760-PC\20210506-230001\20210506-230001_Erpo_0001_crop.avi')
+    print(check)
+    """
+    
     #videopath
     vid = 'originalvid.avi'
     

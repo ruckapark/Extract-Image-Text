@@ -28,7 +28,7 @@ def strptime_backup4(string):
         string = string[:5] + '/' + string[6:]
         return strptime_(string)
     elif len(string.split(' ')[0]) == 9:
-        if string[2] not in ['0','1']:
+        if string[2] not in '01':
             string = string[:2] + '/' + string[3:]
             return strptime_backup1(string)
         else:
@@ -36,6 +36,27 @@ def strptime_backup4(string):
             return strptime_backup2(string)
     else:
         print('String no recognised')
+        
+def strptime_extract(string):
+    """ 
+    Check if start and end characters of string are standard
+    """
+    
+    #Check string beginning
+    for i in range(len(string)):
+        if string[i] in '0123':
+            string = string[i:]
+            break
+    
+    #Check string - BUG if last char is number and too long won't work
+    # '06/05/2021 23:00:19....7543' would fail
+    for i in range(len(string)):
+        if string[::-1][i] in '0123456789':
+            if i:
+                string = string[:-i]
+            break
+        
+    return string
 
 def strptime(string):
     
@@ -45,6 +66,8 @@ def strptime(string):
         strptime_backup2,
         strptime_backup3,
         strptime_backup4]
+    
+    string = strptime_extract(string)
     
     for strp in strps:
         try:
@@ -94,7 +117,7 @@ if __name__ == '__main__':
     #here you should download the tesseract binaries, do not use the pytesseract.exe wrapper
     pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files (x86)\Tesseract-OCR\tesseract.exe'    
     
-    img = cv2.imread('20201211-080603_Erpo_0001_last.jpg',0)
+    img = cv2.imread('20210506-230001_Erpo_0001_crop_first.jpg',0)
     
     #portion of interest
     cropped_img = np.flip(np.transpose(img[0:140,944:964]),0)
