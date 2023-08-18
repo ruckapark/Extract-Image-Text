@@ -70,14 +70,16 @@ if __name__ == '__main__':
                 files = [f for f in os.listdir(r'{}\{}'.format(root,d))]
                 avifile = [f for f in files if 'Gammarus_0001.avi' in f][0]
                 avifile = r'{}\{}\{}'.format(root,d,avifile)
+                
+                #extract first image from video - run from ImageText dir for ffmpeg path
+                [start,end] = extract_endpoints(avifile)
+                starttime = text.extract_datetext(start)[-1]
+                write_starttime(starttime.strftime('%d/%m/%Y %H:%M:%S'),output_dir)
+                
+                #remove unecessary images
+                os.remove(start)
+                os.remove(end)
+                
+                print('Completed for {}'.format(d))
             except:
                 continue
-            
-            #extract first image from video - run from ImageText dir for ffmpeg path
-            [start,end] = extract_endpoints(avifile)
-            starttime = text.extract_datetext(start)[-1]
-            write_starttime(starttime.strftime('%d/%m/%Y %H:%M:%S'),output_dir)
-            
-            #remove unecessary images
-            os.remove(start)
-            os.remove(end)
